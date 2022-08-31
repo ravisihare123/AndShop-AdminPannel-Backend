@@ -1,5 +1,4 @@
 var dbConfig = require("../database/dbConfig");
-const { get } = require("../routes/master");
 
 //category
 async function insertEditCategory(req, res) {
@@ -59,18 +58,38 @@ async function insertEditCategory(req, res) {
 
 async function categoryList(req, res){
     try {
-        var getData = await dbConfig("category_master").select("id", "name","parent_id").where("is_delete", 0)
+        var getData = await dbConfig("category_master as c")
+          .leftJoin("category_master as p", "c.parent_id" ,"=" ,"p.id")
+          .select("c.id", "c.name", "c.parent_id","p.name as parent_name")
+          .where("c.is_delete",0);
+        // console.log(getData);
         return res.json({
             status: true,
             data: getData   
         })
-    
     } catch (err) {
         return res.json({
             status: false,
             msg:err.message
         })
 }
+}
+async function fetchCategoryName(req, res) {
+  try {
+    var getData = await dbConfig("category_master")
+      .select("name")
+      .where("parent_id", 0);
+    // console.log(getData);
+    return res.json({
+      status: true,
+      data: getData,
+    });
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg: err.message,
+    });
+  }
 }
 
 async function deleteCategory(req, res) {
@@ -101,7 +120,8 @@ const master = {
     //category
     insertEditCategory,
     categoryList,
-    deleteCategory
+    deleteCategory,
+    fetchCategoryName
 }
 
 module.exports = master;
