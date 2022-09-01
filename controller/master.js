@@ -77,7 +77,7 @@ async function categoryList(req, res){
 async function fetchCategoryName(req, res) {
   try {
     var getData = await dbConfig("category_master")
-      .select("name")
+      .select("name","id")
       .where("parent_id", 0);
     // console.log(getData);
     return res.json({
@@ -116,12 +116,131 @@ async function deleteCategory(req, res) {
     }
 }
 
-const master = {
-    //category
-    insertEditCategory,
-    categoryList,
-    deleteCategory,
-    fetchCategoryName
+// product
+async function insertEditProduct(req, res) {
+  try {
+    const { Aid, id, categoryid, parentid, name, desc, sprice, mrprice } = req.body;
+
+    var getData = await dbConfig("product_master").where("p_id", id).first();
+
+    var data = {
+      // p_id: id,
+      id: categoryid,
+      parent_id: parentid,
+      name: name,
+      description: desc,
+      sales_price: sprice,
+      mrp: mrprice,
+      image: req.myfilename
+    };
+
+    if (getData) {
+      data.updateAt = new Date();
+      data.updateBy = Aid
+      await dbConfig("product_master").where("p_id", id).update(data)
+      await dbConfig("logs").insert({
+        event_Id: id,
+        event_name: "product",
+        type: "update",
+        createAt: new Date(),
+        createBy: Aid,
+      });
+      return res.json({
+        status: true,
+        msg:"Updated Successfully!!!"
+      })
+    }
+    else {
+      data.createAt = new Date();
+      data.createBy = Aid
+      var insert = await dbConfig("product_master").insert(data);
+      await dbConfig("logs").insert({
+        event_Id: insert[0],
+        event_name: "product",
+        type: "Insert",
+        createAt: new Date(),
+        createBy: Aid,
+      });
+      return res.json({
+        status: true,
+        msg: "Inserted Successfully!!"
+      })
+    }
+
+
+
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg:err.message
+    })
+  }
 }
+
+async function productList(req, res) {
+  try {
+    const { } = req.body;
+    var getData = await dbConfig("product_master as p")
+      .leftJoin("category_master as c","p.id","=","c.id")
+      .leftJoin("category_master as sub","p.parent_id","=","sub.id")
+      .select("p.p_id", "p.id", "p.parent_id", "p.name", "p.description", "p.sales_price", "p.mrp", "p.image", "c.name as category_name","sub.name as sub_name")
+      .where("p.is_delete", 0)
+      // .andWhere("p.id","=","c.id")
+    return res.json({
+      status: true,
+      data:getData
+    })
+    
+  }
+  catch (err) {
+    return res.json({
+      status: false,
+      msg:err.message
+    })
+  }
+}
+
+async function deleteProduct(req, res) {
+  try {
+    
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg: err.message
+    })
+  }
+}
+
+async function fetchParentName(req, res){
+  try {
+      var getData = await dbConfig("category_master as c")
+        .leftJoin("category_master as p", "c.parent_id", "=", "p.id")
+        .select("c.id", "c.name", "c.parent_id", "p.name as parent_name")
+        .where("c.parent_id", "!=", 0);
+  
+      return res.json({
+        status: true,
+        data: getData,
+      });
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg: err.message
+    })
+   }
+}
+
+const master = {
+  //category
+  insertEditCategory,
+  categoryList,
+  deleteCategory,
+  fetchCategoryName,
+  //product
+  insertEditProduct,
+  productList,
+  deleteProduct,
+  fetchParentName,
+};
 
 module.exports = master;
