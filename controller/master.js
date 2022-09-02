@@ -1,3 +1,4 @@
+const { json } = require("express");
 var dbConfig = require("../database/dbConfig");
 
 //category
@@ -122,7 +123,13 @@ async function insertEditProduct(req, res) {
     const { Aid, id, categoryid, parentid, name, desc, sprice, mrprice } = req.body;
 
     var getData = await dbConfig("product_master").where("p_id", id).first();
-
+    // console.log(req.files);
+    var img = []
+    for (var el in req.files) {
+      // console.log(req.files);
+      img.push(req.files[el].originalname);
+    }
+    // console.log(req.files)
     var data = {
       // p_id: id,
       id: categoryid,
@@ -131,7 +138,7 @@ async function insertEditProduct(req, res) {
       description: desc,
       sales_price: sprice,
       mrp: mrprice,
-      image: req.myfilename
+      image: JSON.stringify(img)
     };
 
     if (getData) {
@@ -201,14 +208,26 @@ async function productList(req, res) {
 }
 
 async function deleteProduct(req, res) {
-  try {
-    
-  } catch (err) {
-    return res.json({
-      status: false,
-      msg: err.message
-    })
-  }
+ try {
+   const { Aid, id } = req.body;
+   await dbConfig("product_master").where("p_id", id).update("is_delete", 1);
+   await dbConfig("logs").insert({
+     event_Id: id,
+     event_name: "product",
+     type: "delete",
+     createAt: new Date(),
+     createBy: Aid,
+   });
+   return res.json({
+     status: true,
+     msg: "Deleted Data!!!",
+   });
+ } catch (err) {
+   return res.json({
+     status: false,
+     msg: err.message,
+   });
+ }
 }
 
 async function fetchParentName(req, res){

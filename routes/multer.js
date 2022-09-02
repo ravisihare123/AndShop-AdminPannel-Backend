@@ -1,14 +1,15 @@
 var multer = require("multer");
+var path =require("path")
 var severPath = multer.diskStorage({
-    destination: (req, file, path) => {
-        path(null, "public/images")
+    destination: (req, file, cb) => {
+        cb(null, "public/images")
     },
-    filename: (req, file, path) => {
-        console.log(file, path);
-        
-        var newfilename = file.originalname;
-        req["myfilename"] = newfilename;
-        path(null, newfilename);
+    filename: (req, file, cb) => {
+        // console.log(file, path);
+       cb(
+         null,
+         file.fieldname + path.extname(file.originalname)
+       );
     }
 });
 

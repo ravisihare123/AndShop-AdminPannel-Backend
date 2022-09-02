@@ -12,9 +12,9 @@ router.post("/deleteCategory",baseHelper.CheckAdminToken, master.deleteCategory)
 router.get("/fetchCategoryName", master.fetchCategoryName);
 
 //product
-router.post("/insertEditProduct",multer.single("img"), master.insertEditProduct);
-router.post("/productList", master.productList);
-router.post("/deleteProduct", master.deleteProduct);
+router.post("/insertEditProduct",baseHelper.CheckAdminToken,multer.array("img"), master.insertEditProduct);
+router.post("/productList",baseHelper.CheckAdminToken, master.productList);
+router.post("/deleteProduct",baseHelper.CheckAdminToken, master.deleteProduct);
 router.get("/fetchParentName", master.fetchParentName);
 
 
