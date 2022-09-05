@@ -235,7 +235,8 @@ async function fetchParentName(req, res){
       var getData = await dbConfig("category_master as c")
         .leftJoin("category_master as p", "c.parent_id", "=", "p.id")
         .select("c.id", "c.name", "c.parent_id", "p.name as parent_name")
-        .where("c.parent_id", "!=", 0);
+      .where("c.parent_id", "!=", 0)
+    
   
       return res.json({
         status: true,
@@ -249,6 +250,106 @@ async function fetchParentName(req, res){
    }
 }
 
+// async function fetchProductSubCat(req, res) {
+//   const { categoryid } = req.body;
+//   try {
+//     var getData = await dbConfig("product_master as p")
+//       .leftJoin("category_master as c", "c.parent_id", "=", "p.id")
+//       .select("ic.d", "c.parent_id", "c.name")
+//       .where({ id: categoryid });
+      
+
+//     return res.json({
+//       status: true,
+//       data: getData,
+//     });
+//   } catch (err) {
+//     return res.json({
+//       status: false,
+//       msg: err.message,
+//     });
+//   }
+// }
+
+{/*Banner */ }
+
+async function InsertEditBanner(req, res){
+  try {
+    const { Aid } = req.body;
+    // const getData = await dbConfig("banner_master").where("id", id).first();
+
+    var data = {
+      image1: req.image1,
+      image2: req.image2,
+      image3: req.image3,
+      image4: req.image4,
+      image5: req.image5,
+    };
+    data.updateAt = new Date();
+    data.updateBy = Aid
+// if(getData){
+     await dbConfig("banner_master").update(data);
+    await dbConfig("logs").insert({
+      event_Id: 1,
+      event_name: "banner",
+      type: "update",
+      createAt: new Date(),
+      createBy: Aid,
+    });
+    return res.json({
+      status: true,
+      msg: "Update Successfully!!!"
+    })
+  // }
+    // else {
+    //   data.createAt = new Date()
+    //   data.createBy = Aid
+
+    //   var insert = await dbConfig("banner_master").insert(data);
+    //   await dbConfig("logs").insert({
+    //     event_Id: insert[0],
+    //     event_name: "banner",
+    //     type: "insert",
+    //     createAt: new Date(),
+    //     createBy: Aid,
+    //   });
+    //   return res.json({
+    //     status: true,
+    //     msg: "Inserted Successfully!!"
+    //   })
+
+    // }
+
+
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg: err.message
+    })
+}
+}
+
+async function bannerList(req, res) {
+  try {
+   var getData= await dbConfig("banner_master").select("id", "image1", "image2", "image3", "image4", "image5").where("is_delete",0)
+    return res.json({
+      staus: true,
+      data: getData
+    })
+    
+    
+  } catch (err) {
+    return res.json({
+      status: false,
+      err:err.message
+    })
+  }
+}
+
+
+
+
+
 const master = {
   //category
   insertEditCategory,
@@ -260,6 +361,10 @@ const master = {
   productList,
   deleteProduct,
   fetchParentName,
+  // fetchProductSubCat
+// Banner
+  InsertEditBanner,
+  bannerList  
 };
 
 module.exports = master;

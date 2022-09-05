@@ -16,6 +16,21 @@ router.post("/insertEditProduct",baseHelper.CheckAdminToken,multer.array("img"),
 router.post("/productList",baseHelper.CheckAdminToken, master.productList);
 router.post("/deleteProduct",baseHelper.CheckAdminToken, master.deleteProduct);
 router.get("/fetchParentName", master.fetchParentName);
+// router.post("/fetchSubcat", master.fetchProductSubCat);
+
+//Banner
+router.post(
+  "/insertEditBanner",
+  multer.fields([
+    { name: "image1" },
+    { name: "image2" },
+    { name: "image3" },
+    { name: "image4" },
+    { name: "image5" },
+  ]), baseHelper.CheckAdminToken,
+  master.InsertEditBanner
+);
+router.post("/bannerList",baseHelper.CheckAdminToken, master.bannerList);
 
 
 module.exports = router;
