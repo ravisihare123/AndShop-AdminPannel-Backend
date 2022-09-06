@@ -13,7 +13,7 @@ router.get("/fetchCategoryName", master.fetchCategoryName);
 
 //product
 router.post("/insertEditProduct",baseHelper.CheckAdminToken,multer.array("img"), master.insertEditProduct);
-router.post("/productList",baseHelper.CheckAdminToken, master.productList);
+router.post("/productList", master.productList);
 router.post("/deleteProduct",baseHelper.CheckAdminToken, master.deleteProduct);
 router.get("/fetchParentName", master.fetchParentName);
 // router.post("/fetchSubcat", master.fetchProductSubCat);
@@ -30,7 +30,7 @@ router.post(
   ]), baseHelper.CheckAdminToken,
   master.InsertEditBanner
 );
-router.post("/bannerList",baseHelper.CheckAdminToken, master.bannerList);
+router.post("/bannerList", master.bannerList);
 
 
 module.exports = router;
