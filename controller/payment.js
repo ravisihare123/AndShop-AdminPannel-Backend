@@ -1,3 +1,4 @@
+var crypto = require("crypto");
 
 async function AddmoneyByrozarpay(req, res) {
   try {
@@ -21,7 +22,7 @@ async function AddmoneyByrozarpay(req, res) {
         status: true,
         order: order,
       });
-        // console.log(order);
+      // console.log(order);
     });
   } catch (err) {
     return res.json({
@@ -31,104 +32,34 @@ async function AddmoneyByrozarpay(req, res) {
   }
 }
 
-// async function VerifyPayment(req, res) {
-//   try {
-//     // console.log(req.body)
-//     const { response } = req.body;
+async function verifyPayment(req, res) {
+  // try {
+  //   const { response } = req.body;
 
-//     const body =
-//       response.razorpay_order_id + "|" + response.razorpay_payment_id;
-//     var expectedSignature = crypto
-//       .createHmac("sha256", "803IhqE0h11s8eZBSWwpUKZS")
-//       .update(body.toString())
-//       .digest("hex");
-//     // generated_signature = hmac_sha256(response.razorpay_order_id + "|" + response.razorpay_payment_id, secret);
+  //   // console.log(response);
 
-//     if (expectedSignature == response.razorpay_signature) {
-//       // console.log("payment is successful");
-//       // console.log(req.body)
+  //   const body =
+  //     response.razorpay_order_id + "|" + response.razorpay_payment_id;
+  //   const expectedSignature = crypto
+  //     .createHmac("sha256", "803IhqE0h11s8eZBSWwpUKZS")
+  //     .update(body.toString())
+  //     .digest("hex");
+  //   // generated_signature = hmac_sha256(response.razorpay_order_id + "|" + response.razorpay_payment_id, secret);
 
-//       const { uid, addmoney, type } = req.body;
-
-//       const txn_id = crypto.randomBytes(3).toString("hex");
-
-//       if (type == "credit") {
-//         var credit = addmoney;
-//         var debit = 0;
-//       } else {
-//         var debit = addmoney;
-//         var credit = 0;
-//       }
-
-//       var data = {
-//         uid: uid,
-//         txn_id: txn_id + new Date().getTime(),
-//         payment_mode: "online",
-//         note: 0,
-//         credit: credit,
-//         debit: debit,
-//         createAt: new Date(),
-//         createBy: uid,
-//       };
-
-//       var insert = await dbConfig("passbook").insert(data);
-
-//       const getData = await dbConfig("user_wallet").where("uid", uid).first();
-
-//       if (getData) {
-//         if (type == "credit") {
-//           var amt = getData.balance;
-//           var closing_bal = amt + parseInt(addmoney);
-//         } else {
-//           var amt = getData.balance;
-//           var closing_bal = amt - parseInt(addmoney);
-//         }
-
-//         var wallet_data = {
-//           balance: closing_bal,
-//           last_txid: txn_id + new Date().getTime(),
-//           updateAt: new Date(),
-//           updateBy: uid,
-//         };
-
-//         await dbConfig("user_wallet").where("uid", uid).update(wallet_data);
-//         await dbConfig("logs").insert({
-//           event_Id: uid,
-//           event_name: "user_wallet",
-//           type: "Add Money",
-//           createAt: new Date(),
-//           createBy: uid,
-//         });
-//       } else {
-//         if (type == "credit") {
-//           var closing_bal = 0 + parseInt(addmoney);
-//         } else {
-//           var closing_bal = 0 - parseInt(addmoney);
-//         }
-//       }
-
-//       return res.json({
-//         status: true,
-//         // balance: getBalance.balance ? getBalance.balance : 0,
-//         msg: "payment is successful",
-//       });
-//     } else {
-//       return res.json({
-//         status: false,
-//         // balance: getBalance.balance ? getBalance.balance : 0,
-//         msg: "payment NOT  successful",
-//       });
-//     }
-//   } catch (err) {
-//     return res.json({
-//       status: false,
-//       msg: err.message,
-//     });
-//   }
-// }
-
-const payment = {
-    AddmoneyByrozarpay
+  //   if (expectedSignature === response.razorpay_signature) {
+  //     // console.log("payment is successful");
+  //     res.status(200).send({
+  //       status: true,
+  //     });
+  //   }
+  // } catch (err) {
+  //   console.log(err);
+  // }
 }
 
-module.exports= payment;
+const payment = {
+  AddmoneyByrozarpay,
+  verifyPayment
+};
+
+module.exports = payment;

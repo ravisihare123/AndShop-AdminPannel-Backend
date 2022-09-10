@@ -66,7 +66,7 @@ async function Adminlogin(req, res) {
     const checkpassword = bcrypt.compareSync(password, getAdmin.password);
     // console.log(checkpassword);
     if (checkpassword) {
-      const jwtSecretKey = process.env.SECRET;
+      const jwtSecretKey = process.env.SECRET;  
       // console.log("SECRET", process.env.SECRET);
       const token = jwt.sign(
         { id: getAdmin.id, name: getAdmin.name }, jwtSecretKey,{ expiresIn: "1h",}
