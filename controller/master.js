@@ -346,6 +346,43 @@ async function bannerList(req, res) {
   }
 }
 
+// oreder
+
+async function insertOrder(req, res) {
+  
+  const {firstname, lastname, email, country, state, zipcode, address, message, itemname,itemprice} = req.body
+  try {
+  
+    var data = {
+      firstname: firstname,
+      lastname: lastname,
+      email: email,
+      country: country,
+      state: state,
+      zipcode: zipcode,
+      address: address,
+      message: message,
+    };
+    var order = await dbConfig("order_master").insert(data)
+    await dbConfig("item_master").insert({
+      order_id: order,
+      itemname: itemname,
+      itemprice:itemprice
+    })
+    return res.json({
+      status: true,
+      data: order
+    })
+    
+  }
+  catch (err) {
+    return res.json({
+      status: false,
+      msg:err.message
+    })
+  }
+  
+}
 
 
 
@@ -364,7 +401,9 @@ const master = {
   // fetchProductSubCat
 // Banner
   InsertEditBanner,
-  bannerList  
+  bannerList,
+  //order
+  insertOrder,
 };
 
 module.exports = master;

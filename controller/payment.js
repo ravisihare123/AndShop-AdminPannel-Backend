@@ -22,7 +22,7 @@ async function AddmoneyByrozarpay(req, res) {
         status: true,
         order: order,
       });
-      // console.log(order);
+      console.log(order);
     });
   } catch (err) {
     return res.json({

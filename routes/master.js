@@ -32,5 +32,8 @@ router.post(
 );
 router.post("/bannerList", master.bannerList);
 
+// order
+router.post("/orderDetails",master.insertOrder);
+
 
 module.exports = router;
