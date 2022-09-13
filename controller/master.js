@@ -3,82 +3,81 @@ var dbConfig = require("../database/dbConfig");
 
 //category
 async function insertEditCategory(req, res) {
-    try {
-        const { Aid, id, name, parentid } = req.body;
-        const getData = await dbConfig("category_master").where("id", id).first();
+  try {
+    const { Aid, id, name, parentid } = req.body;
+    const getData = await dbConfig("category_master").where("id", id).first();
 
-        var data = {
-            name: name,
-            parent_id:parentid
-        }
+    var data = {
+      name: name,
+      parent_id: parentid,
+    };
 
-        if (getData) {
-            data.updateAt = new Date()
-            data.updateBy = Aid
-          var update =   await dbConfig("category_master").where("id", id).update(data);
-            await dbConfig("logs").insert({
-              event_Id: Aid,
-              event_name: "category",
-              type: "Update",
-              createAt: new Date(),
-              createBy: id,
-            });
-            return res.json({
-                status: true,
-                msg: "category updated!!",
-                data: update
-            })
-        }
+    if (getData) {
+      data.updateAt = new Date();
+      data.updateBy = Aid;
+      var update = await dbConfig("category_master")
+        .where("id", id)
+        .update(data);
+      await dbConfig("logs").insert({
+        event_Id: Aid,
+        event_name: "category",
+        type: "Update",
+        createAt: new Date(),
+        createBy: id,
+      });
+      return res.json({
+        status: true,
+        msg: "category updated!!",
+        data: update,
+      });
+    } else {
+      data.createAt = new Date();
+      data.createBy = Aid;
 
-        else {
-            data.createAt = new Date();
-            data.createBy = Aid
-
-            var insert = await dbConfig("category_master").insert(data)
-            await dbConfig("logs").insert({
-              event_Id: insert[0],
-              event_name: "categroy",
-              type: "Insert",
-              createAt: new Date(),
-              createBy:Aid,
-            });
-            return res.json({
-                status: true,
-                msg: " category inserted!!",
-                data: insert
-            })
-        }
-        
-    } catch (err) {
-        return res.json({
-            status: false,
-            msg: err.message
-        })
+      var insert = await dbConfig("category_master").insert(data);
+      await dbConfig("logs").insert({
+        event_Id: insert[0],
+        event_name: "categroy",
+        type: "Insert",
+        createAt: new Date(),
+        createBy: Aid,
+      });
+      return res.json({
+        status: true,
+        msg: " category inserted!!",
+        data: insert,
+      });
     }
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg: err.message,
+    });
+  }
 }
 
-async function categoryList(req, res){
-    try {
-        var getData = await dbConfig("category_master as c")
-          .leftJoin("category_master as p", "c.parent_id" ,"=" ,"p.id")
-          .select("c.id", "c.name", "c.parent_id","p.name as parent_name")
-          .where("c.is_delete",0);
-        // console.log(getData);
-        return res.json({
-            status: true,
-            data: getData   
-        })
-    } catch (err) {
-        return res.json({
-            status: false,
-            msg:err.message
-        })
-}
+async function categoryList(req, res) {
+  try {
+    var getData = await dbConfig("category_master as c")
+      .leftJoin("category_master as p", "c.parent_id", "=", "p.id")
+      .select("c.id", "c.name", "c.parent_id", "p.name as parent_name")
+      .where("c.is_delete", 0);
+    // console.log(getData);
+    return res.json({
+      status: true,
+      data: getData,
+    });
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg: err.message,
+    });
+  }
 }
 async function fetchCategoryName(req, res) {
   try {
     var getData = await dbConfig("category_master")
-      .select("name","id")
+      .select("name", "id")
       .where("parent_id", 0);
     // console.log(getData);
     return res.json({
@@ -94,37 +93,37 @@ async function fetchCategoryName(req, res) {
 }
 
 async function deleteCategory(req, res) {
-    try {
-        const { Aid, id } = req.body;
-        await dbConfig("category_master").where("id", id).update("is_delete", 1)
-        await dbConfig("logs").insert({
-          event_Id:id,
-          event_name: "categroy",
-          type: "delete",
-          createAt: new Date(),
-          createBy: Aid,
-        });
-        return res.json({
-            status: true,
-            msg:"Deleted Data!!!"
-        })
-        
-    } catch (err) {
-        return res.json({
-            status: false,
-            msg:err.message,
-        })
-    }
+  try {
+    const { Aid, id } = req.body;
+    await dbConfig("category_master").where("id", id).update("is_delete", 1);
+    await dbConfig("logs").insert({
+      event_Id: id,
+      event_name: "categroy",
+      type: "delete",
+      createAt: new Date(),
+      createBy: Aid,
+    });
+    return res.json({
+      status: true,
+      msg: "Deleted Data!!!",
+    });
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg: err.message,
+    });
+  }
 }
 
 // product
 async function insertEditProduct(req, res) {
   try {
-    const { Aid, id, categoryid, parentid, name, desc, sprice, mrprice } = req.body;
+    const { Aid, id, categoryid, parentid, name, desc, sprice, mrprice } =
+      req.body;
 
     var getData = await dbConfig("product_master").where("p_id", id).first();
     // console.log(req.files);
-    var img = []
+    var img = [];
     for (var el in req.files) {
       // console.log(req.files);
       img.push(req.files[el].originalname);
@@ -138,13 +137,13 @@ async function insertEditProduct(req, res) {
       description: desc,
       sales_price: sprice,
       mrp: mrprice,
-      image: JSON.stringify(img)
+      image: JSON.stringify(img),
     };
 
     if (getData) {
       data.updateAt = new Date();
-      data.updateBy = Aid
-      await dbConfig("product_master").where("p_id", id).update(data)
+      data.updateBy = Aid;
+      await dbConfig("product_master").where("p_id", id).update(data);
       await dbConfig("logs").insert({
         event_Id: id,
         event_name: "product",
@@ -154,12 +153,11 @@ async function insertEditProduct(req, res) {
       });
       return res.json({
         status: true,
-        msg:"Updated Successfully!!!"
-      })
-    }
-    else {
+        msg: "Updated Successfully!!!",
+      });
+    } else {
       data.createAt = new Date();
-      data.createBy = Aid
+      data.createBy = Aid;
       var insert = await dbConfig("product_master").insert(data);
       await dbConfig("logs").insert({
         event_Id: insert[0],
@@ -170,84 +168,95 @@ async function insertEditProduct(req, res) {
       });
       return res.json({
         status: true,
-        msg: "Inserted Successfully!!"
-      })
+        msg: "Inserted Successfully!!",
+      });
     }
-
-
-
   } catch (err) {
     return res.json({
       status: false,
-      msg:err.message
-    })
+      msg: err.message,
+    });
   }
 }
 
 async function productList(req, res) {
   try {
-    const { } = req.body;
+    const {} = req.body;
     var getData = await dbConfig("product_master as p")
-      .leftJoin("category_master as c","p.id","=","c.id")
-      .leftJoin("category_master as sub","p.parent_id","=","sub.id")
-      .select("p.p_id", "p.id", "p.parent_id", "p.name", "p.description", "p.sales_price", "p.mrp", "p.image", "c.name as category_name","sub.name as sub_name")
-      .where("p.is_delete", 0)
-      // .andWhere("p.id","=","c.id")
+      .leftJoin("category_master as c", "p.id", "=", "c.id")
+      .leftJoin("category_master as sub", "p.parent_id", "=", "sub.id")
+      .select(
+        "p.p_id",
+        "p.id",
+        "p.parent_id",
+        "p.name",
+        "p.description",
+        "p.sales_price",
+        "p.mrp",
+        "p.image",
+        "c.name as category_name",
+        "sub.name as sub_name"
+      )
+      .where("p.is_delete", 0);
+    // .andWhere("p.id","=","c.id")
+    var list = [];
+    for (var i in getData) {
+      var row = getData[i];
+      row.image = JSON.parse(row.image);
+      list.push(row);
+    }
     return res.json({
       status: true,
-      data:getData
-    })
-    
-  }
-  catch (err) {
+      data: list,
+    });
+  } catch (err) {
     return res.json({
       status: false,
-      msg:err.message
-    })
+      msg: err.message,
+    });
   }
 }
 
 async function deleteProduct(req, res) {
- try {
-   const { Aid, id } = req.body;
-   await dbConfig("product_master").where("p_id", id).update("is_delete", 1);
-   await dbConfig("logs").insert({
-     event_Id: id,
-     event_name: "product",
-     type: "delete",
-     createAt: new Date(),
-     createBy: Aid,
-   });
-   return res.json({
-     status: true,
-     msg: "Deleted Data!!!",
-   });
- } catch (err) {
-   return res.json({
-     status: false,
-     msg: err.message,
-   });
- }
-}
-
-async function fetchParentName(req, res){
   try {
-      var getData = await dbConfig("category_master as c")
-        .leftJoin("category_master as p", "c.parent_id", "=", "p.id")
-        .select("c.id", "c.name", "c.parent_id", "p.name as parent_name")
-      .where("c.parent_id", "!=", 0)
-    
-  
-      return res.json({
-        status: true,
-        data: getData,
-      });
+    const { Aid, id } = req.body;
+    await dbConfig("product_master").where("p_id", id).update("is_delete", 1);
+    await dbConfig("logs").insert({
+      event_Id: id,
+      event_name: "product",
+      type: "delete",
+      createAt: new Date(),
+      createBy: Aid,
+    });
+    return res.json({
+      status: true,
+      msg: "Deleted Data!!!",
+    });
   } catch (err) {
     return res.json({
       status: false,
-      msg: err.message
-    })
-   }
+      msg: err.message,
+    });
+  }
+}
+
+async function fetchParentName(req, res) {
+  try {
+    var getData = await dbConfig("category_master as c")
+      .leftJoin("category_master as p", "c.parent_id", "=", "p.id")
+      .select("c.id", "c.name", "c.parent_id", "p.name as parent_name")
+      .where("c.parent_id", "!=", 0);
+
+    return res.json({
+      status: true,
+      data: getData,
+    });
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg: err.message,
+    });
+  }
 }
 
 // async function fetchProductSubCat(req, res) {
@@ -257,7 +266,6 @@ async function fetchParentName(req, res){
 //       .leftJoin("category_master as c", "c.parent_id", "=", "p.id")
 //       .select("ic.d", "c.parent_id", "c.name")
 //       .where({ id: categoryid });
-      
 
 //     return res.json({
 //       status: true,
@@ -271,9 +279,11 @@ async function fetchParentName(req, res){
 //   }
 // }
 
-{/*Banner */ }
+{
+  /*Banner */
+}
 
-async function InsertEditBanner(req, res){
+async function InsertEditBanner(req, res) {
   try {
     const { Aid } = req.body;
     // const getData = await dbConfig("banner_master").where("id", id).first();
@@ -286,9 +296,9 @@ async function InsertEditBanner(req, res){
       image5: req.image5,
     };
     data.updateAt = new Date();
-    data.updateBy = Aid
-// if(getData){
-     await dbConfig("banner_master").update(data);
+    data.updateBy = Aid;
+    // if(getData){
+    await dbConfig("banner_master").update(data);
     await dbConfig("logs").insert({
       event_Id: 1,
       event_name: "banner",
@@ -298,9 +308,9 @@ async function InsertEditBanner(req, res){
     });
     return res.json({
       status: true,
-      msg: "Update Successfully!!!"
-    })
-  // }
+      msg: "Update Successfully!!!",
+    });
+    // }
     // else {
     //   data.createAt = new Date()
     //   data.createBy = Aid
@@ -319,40 +329,51 @@ async function InsertEditBanner(req, res){
     //   })
 
     // }
-
-
   } catch (err) {
     return res.json({
       status: false,
-      msg: err.message
-    })
-}
+      msg: err.message,
+    });
+  }
 }
 
 async function bannerList(req, res) {
   try {
-   var getData= await dbConfig("banner_master").select("id", "image1", "image2", "image3", "image4", "image5").where("is_delete",0)
+    var getData = await dbConfig("banner_master")
+      .select("id", "image1", "image2", "image3", "image4", "image5")
+      .where("is_delete", 0);
     return res.json({
       staus: true,
-      data: getData
-    })
-    
-    
+      data: getData,
+    });
   } catch (err) {
     return res.json({
       status: false,
-      err:err.message
-    })
+      err: err.message,
+    });
   }
 }
 
 // oreder
 
 async function insertOrder(req, res) {
-  
-  const {firstname, lastname, email, country, state, zipcode, address, message, itemname,itemprice} = req.body
   try {
-  
+    const {
+      firstname,
+      lastname,
+      email,
+      country,
+      state,
+      zipcode,
+      address,
+      message,
+      itemname,
+      itemprice,
+    } = req.body;
+
+    console.log(req.body.itemname);
+    console.log(req.body.itemprice);
+
     var data = {
       firstname: firstname,
       lastname: lastname,
@@ -363,29 +384,27 @@ async function insertOrder(req, res) {
       address: address,
       message: message,
     };
-    var order = await dbConfig("order_master").insert(data)
-    await dbConfig("item_master").insert({
+
+    let data2 = {
       order_id: order,
       itemname: itemname,
-      itemprice:itemprice
-    })
+      itemprice: itemprice,
+    };
+    // console.log(itemname);
+    var order = await dbConfig("order_master").insert(data);
+    var name = "";
+    await dbConfig("item_master").insert(data2);
     return res.json({
       status: true,
-      data: order
-    })
-    
-  }
-  catch (err) {
+      data: order,
+    });
+  } catch (err) {
     return res.json({
       status: false,
-      msg:err.message
-    })
+      msg: err.message,
+    });
   }
-  
 }
-
-
-
 
 const master = {
   //category
@@ -399,7 +418,7 @@ const master = {
   deleteProduct,
   fetchParentName,
   // fetchProductSubCat
-// Banner
+  // Banner
   InsertEditBanner,
   bannerList,
   //order
