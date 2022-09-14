@@ -33,7 +33,10 @@ router.post(
 router.post("/bannerList", master.bannerList);
 
 // order
-router.post("/orderDetails",master.insertOrder);
+router.post("/orderDetails", master.insertOrder);
+router.post("/orderList", master.orderList);
+//item
+router.post("/itemList", master.itemList);
 
 
 module.exports = router;

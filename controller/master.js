@@ -356,6 +356,22 @@ async function bannerList(req, res) {
 
 // oreder
 
+async function orderList(req, res) {
+  try {
+    var getList = await dbConfig("order_master").select("order_id","firstname","lastname","email","country","state","zipcode","address","message")
+      .where("is_delete", 0)
+    return res.json({
+      status: true,
+      data: getList
+})    
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg:err.message
+    })
+  }
+}
+
 async function insertOrder(req, res) {
   try {
     const {
@@ -367,12 +383,14 @@ async function insertOrder(req, res) {
       zipcode,
       address,
       message,
+      productid,
       itemname,
       itemprice,
     } = req.body;
 
-    console.log(req.body.itemname);
-    console.log(req.body.itemprice);
+    // console.log(req.body.itemname);
+    // console.log(req.body.itemprice);
+    // console.log(req.body.productid);
 
     var data = {
       firstname: firstname,
@@ -385,15 +403,18 @@ async function insertOrder(req, res) {
       message: message,
     };
 
-    let data2 = {
-      order_id: order,
-      itemname: itemname,
-      itemprice: itemprice,
-    };
-    // console.log(itemname);
+  
+
     var order = await dbConfig("order_master").insert(data);
-    var name = "";
-    await dbConfig("item_master").insert(data2);
+
+    for (var x = 0; x < itemname.length; x++) {
+      await dbConfig("item_master").insert({
+        order_id: order,
+        p_id: productid[x],
+        itemname: itemname[x],
+        itemprice: itemprice[x],
+      });
+    }
     return res.json({
       status: true,
       data: order,
@@ -403,6 +424,24 @@ async function insertOrder(req, res) {
       status: false,
       msg: err.message,
     });
+  }
+}
+
+// item 
+async function itemList(req,res) {
+  try {
+    var getList = await dbConfig("item_master").select("item_id","order_id","p_id","itemname","itemprice")
+    .where("is_delete", 0)
+    return res.json({
+      status: true,
+      data: getList
+    })
+    
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg:err.message
+    })
   }
 }
 
@@ -423,6 +462,11 @@ const master = {
   bannerList,
   //order
   insertOrder,
+  orderList,
+
+  //item 
+  itemList
+
 };
 
 module.exports = master;
